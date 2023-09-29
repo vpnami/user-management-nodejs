@@ -1,31 +1,14 @@
 const { Router } = require('express');
 const passport = require('passport');
 const { Strategy } = require('passport-local');
-const mongoose = require("mongoose");
 const router = Router();
 
-mongoose
-  .connect('mongodb://localhost:27017/auth_register')
-  .then(() => console.log('Connected to DB'))
-  .catch((err) => console.log(err));
-
-const UserSchema = new mongoose.Schema({
-    username: {
-      type: mongoose.SchemaTypes.String,
-      required: true
-    },
-    password: {
-      type: mongoose.SchemaTypes.BigInt,
-      required: true,
-    }
-});
-
-const Users = mongoose.model('sessions', UserSchema);
-
-console.log("Users");
-console.log(auth_users);
+const { basicAuthentication } = require('../controllers/basicAuth');
+const passportAuthentication = require('../controllers/passportAuth');
+const Users = require('../utils/connect_db');
 
 passport.serializeUser((user, done) => {
+    console.log("Serializing User..");
     console.log(user);
     done(null, user.id);
   });
@@ -44,43 +27,11 @@ passport.deserializeUser(async (id, done) => {
   });
 
 passport.use(
-    new Strategy (
-        async function verify (username, password, done) {
-            try {
-                const user = await Users.findOne({ username });
-                console.log(user);
-                if (!user) {
-                    console.log("Invalid Authentication");
-                    done(null, null);
-                } else {
-                    console.log("Authenticated Successfully");
-                    done(null, user);
-                }
-            } catch(err) {
-                console.log(err);
-                done(err, null);
-            }
-    }
-)
+    new Strategy ( passportAuthentication )
 );
 
 // Basic Authentication with no validation against a database
-router.post('/login', (req, res) => {
-    const { username, password } = req.body;
-    if ( username && password ) {
-        if ( req.session.user ) {
-            res.send(req.session.user)
-        }
-        else {
-            req.session.user = {
-                username,
-            };
-            res.send(req.session)
-        }
-    } else {
-        res.sendStatus(401);
-    };
-});
+router.post('/login', basicAuthentication);
 
 // Authentication using passport JS
 router.post('/login/passport', passport.authenticate('local'), (req, res) => {
