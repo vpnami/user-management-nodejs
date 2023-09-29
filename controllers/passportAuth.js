@@ -1,4 +1,4 @@
-const Users = require('../utils/connect_db');
+const Users = require('../utils/user_schema');
 
 async function passportVerify (username, password, done) {
     try {

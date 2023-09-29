@@ -4,7 +4,7 @@ const { Strategy } = require('passport-local');
 const router = Router();
 
 const { basicAuthentication } = require('../controllers/basicAuth');
-const passportAuthentication = require('../controllers/passportAuth');
+const passportVerifyAuthentication = require('../controllers/passportAuth');
 const Users = require('../utils/connect_db');
 
 passport.serializeUser((user, done) => {
@@ -27,7 +27,7 @@ passport.deserializeUser(async (id, done) => {
   });
 
 passport.use(
-    new Strategy ( passportAuthentication )
+    new Strategy ( passportVerifyAuthentication )
 );
 
 // Basic Authentication with no validation against a database
