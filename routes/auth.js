@@ -5,7 +5,7 @@ const router = Router();
 
 const { basicAuthentication } = require('../controllers/basicAuth');
 const passportVerifyAuthentication = require('../controllers/passportAuth');
-const Users = require('../utils/connect_db');
+const Users = require('../utils/user_schema');
 
 passport.serializeUser((user, done) => {
     console.log("Serializing User..");
